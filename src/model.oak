@@ -11,6 +11,7 @@
 	lower: lower
 	split: split
 	contains?: strContains?
+	join: join
 } := import('str')
 fs := import('fs')
 json := import('json')
@@ -34,6 +35,17 @@ fn updatesAtTime(t, withUpdates) with exec('grep', [
 	:error -> withUpdates(?)
 	_ -> evt.stdout |> split('\n') |> map(json.parse) |>
 		filter(fn(u) u != ?) |> filter(fn(u) u.t = t) |> withUpdates()
+}
+
+fn deleteAtTime(t, withRes) with fs.readFile(StreamFile) fn(file) if file {
+	? -> withRes(?)
+	_ -> {
+		updates := file |> split('\n') |> filter(fn(s) s != '') |> map(json.parse)
+		deletedUpdates := updates |> with filter() fn(u) u.t != t
+
+		updatedLines := deletedUpdates |> map(json.serialize) |> join('\n')
+		fs.writeFile(StreamFile, updatedLines, withRes)
+	}
 }
 
 fn latestUpdates(page, count, searchQuery, withUpdates) {

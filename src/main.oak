@@ -6,6 +6,8 @@
 	map: map
 } := import('std')
 {
+	join: join
+	replace: replace
 	trim: trim
 } := import('str')
 {
@@ -15,6 +17,7 @@
 fs := import('fs')
 datetime := import('datetime')
 path := import('path')
+json := import('json')
 http := import('http')
 
 model := import('model')
@@ -31,33 +34,46 @@ with server.route('/updates/:timestamp') fn(params) fn(req, end) if req.method {
 	'GET' -> if timestamp := int(params.timestamp) {
 		? -> end({
 			status: 400
-			body: 'invalid time ' << params.timestamp
+			headers: PageHeaders
+			body: view.page(
+				view.search() << view.message('Invalid timestamp "' << params.timestamp << '".')
+			)
 		})
 		_ -> with model.updatesAtTime(timestamp) fn(updates) if updates {
 			? -> end({
 				status: 500
 				headers: PageHeaders
 				body: view.page(
-					view.search() <<
-						'No updates from this time'
+					view.search() << view.message('No updates from this time.')
 				)
 			})
-			_ -> end({
-				status: 200
-				headers: PageHeaders
-				body: view.page(
-					view.search() <<
-						view.feed(updates)
-				)
-			})
+			_ -> if params.raw {
+				? -> end({
+					status: 200
+					headers: PageHeaders
+					body: view.page(
+						view.search() << view.feed(updates)
+					)
+				})
+				_ -> end({
+					status: 200
+					headers: { 'Content-Type': 'text/plain' }
+					body: updates |> map(fn(u) u.s) |> join('\n\n')
+				})
+			}
 		}
 	}
+	_ -> end(http.MethodNotAllowed)
 }
 
-with server.route('/updates') fn(params) fn(req, end) if req.method {
+with server.route('/author/updates') fn(params) fn(req, end) if req.method {
 	'POST' -> {
 		// assume urlencoded form data format s=(.*)
-		status := req.body |> slice(2) |> http.percentDecode() |> trim()
+		status := req.body |>
+			slice(2) |>
+			http.percentDecode() |>
+			trim() |>
+			replace('\r\n', '\n')
 		with model.appendUpdate(status) fn(res) if res {
 			true -> end({
 				status: 303
@@ -66,7 +82,32 @@ with server.route('/updates') fn(params) fn(req, end) if req.method {
 			})
 			_ -> end({
 				status: 500
-				body: 'Error saving update. Please try again.'
+				headers: PageHeaders
+				body: view.page(
+					view.search() << view.message('Could not save update. Please try again.')
+				)
+			})
+		}
+	}
+	_ -> end(http.MethodNotAllowed)
+}
+
+with server.route('/author/delete') fn(params) fn(req, end) if req.method {
+	'POST' -> {
+		// assume urlencoded form data format t=(.*)
+		timestamp := req.body |> slice(2) |> http.percentDecode() |> trim() |> int()
+		with model.deleteAtTime(timestamp) fn(res) if res {
+			true -> end({
+				status: 303
+				headers: { Location: '/' }
+				body: ''
+			})
+			_ -> end({
+				status: 500
+				headers: PageHeaders
+				body: view.page(
+					view.search() << view.message('Could not delete this update. Please try again.')
+				)
 			})
 		}
 	}
@@ -77,24 +118,25 @@ with server.route('/on/:year/:month/:day') fn(params) fn(req, end) if req.method
 	'GET' -> if [year, month, day] := [params.year, params.month, params.day] |> map(int) {
 		[?, _, _], [_, ?, _], [_, _, ?] -> end({
 			status: 400
-			body: 'invalid request'
+			headers: PageHeaders
+			body: view.page(
+				view.search() << view.message('Invalid request.')
+			)
 		})
 		_ -> with model.updatesOnDay(year, month, day) fn(updates) if updates {
 			? -> end({
 				status: 500
 				headers: PageHeaders
 				body: view.page(
-					view.search() <<
-						'Could not read latest updates'
+					view.search() << view.message('Could not read the latest updates.')
 				)
 			})
 			_ -> end({
 				status: 200
 				headers: PageHeaders
 				body: view.page(
-					view.search() <<
-						view.feed(updates)
-					'{{0}}/{{1}}/{{2}}' |> format(params.year, params.month, params.day)
+					view.search() << view.feed(updates)
+					'Updates on {{0}}/{{1}}/{{2}}' |> format(params.year, params.month, params.day)
 				)
 			})
 		}
@@ -112,7 +154,19 @@ with server.route('/author/') fn(params) fn(req, end) if req.method {
 		headers: PageHeaders
 		body: view.page(
 			view.author()
-			'author'
+			'Author'
+		)
+	})
+	_ -> end(http.MethodNotAllowed)
+}
+
+with server.route('/about/') fn(params) fn(req, end) if req.method {
+	'GET' -> end({
+		status: 200
+		headers: PageHeaders
+		body: view.page(
+			view.about()
+			'About the stream'
 		)
 	})
 	_ -> end(http.MethodNotAllowed)
@@ -129,8 +183,7 @@ with server.route('/') fn(params) fn(req, end) if req.method {
 				status: 500
 				headers: PageHeaders
 				body: view.page(
-					view.search() <<
-						'Could not read latest updates'
+					view.search() << view.message('Could not read latest updates.')
 				)
 			})
 			_ -> end({
@@ -138,8 +191,7 @@ with server.route('/') fn(params) fn(req, end) if req.method {
 				headers: PageHeaders
 				body: view.page(
 					view.search(query) <<
-						view.index(updates, last?, next?, page, count, query)
-					?
+						view.content(updates, last?, next?, page, count, query)
 				)
 			})
 		}

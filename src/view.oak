@@ -56,12 +56,16 @@ fn update(u) '<div class="update">
 )
 
 fn feed(updates) if updates {
-	[] -> '<div class="feed">No updates</div>'
+	[] -> '<div class="feed">
+		<div class="message">No updates.</div>
+	</div>'
 	_ -> '<div class="feed">{{0}}</div>' |>
 		format(updates |> reverse() |> map(update) |> join())
 }
 
-fn index(updates, last?, next?, page, count, query) '
+fn message(s) '<div class="message">{{0}}</div>' |> format(s)
+
+fn content(updates, last?, next?, page, count, query) '
 {{0}}
 <div class="pageControls">{{1}}{{2}}</div>
 ' |> format(
@@ -80,12 +84,22 @@ fn index(updates, last?, next?, page, count, query) '
 	}
 )
 
-fn author '<form class="author" action="/updates" method="post">
+fn author '<h2>New update</h2>
+<form class="author" action="/author/updates" method="post">
 	<textarea type="text" name="s"
 		placeholder="What are you thinking?"
 		required autofocus></textarea>
 	<button type="submit">Send</button>
+</form>
+<h2>Delete update</h2>
+<form class="delete" action="/author/delete" method="post">
+	<input type="text" name="t" placeholder="123456789" required>
+	<button type="submit">Delete</button>
 </form>'
+
+fn about '
+<p>About the stream....this is a thing</p>
+'
 
 fn search(searchQuery) '<form class="search" action="/" method="get">
 	<input type="text" name="q"
@@ -110,9 +124,9 @@ fn page(body, title, searchQuery) '<!doctype html>
 			<a href="/about/">about</a>
 		</nav>
 	</header>
+	<h1>{{1}}</h1>
 	<main>
-		<h1>{{2}}</h1>
-		{{1}}
+		{{2}}
 	</main>
 	<footer>
 	</footer>
@@ -121,10 +135,10 @@ fn page(body, title, searchQuery) '<!doctype html>
 		?, '' -> 'the stream'
 		_ -> title + ' | the stream'
 	}
-	body
 	if title {
 		? -> 'Linus\'s stream'
 		_ -> title
 	}
+	body
 )
 
