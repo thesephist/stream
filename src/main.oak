@@ -52,7 +52,8 @@ with server.route('/updates/:timestamp') fn(params) fn(req, end) if req.method {
 					status: 200
 					headers: PageHeaders
 					body: view.page(
-						view.search() << view.feed(updates)
+						view.feed(updates)
+						''
 					)
 				})
 				_ -> end({
@@ -69,6 +70,7 @@ with server.route('/updates/:timestamp') fn(params) fn(req, end) if req.method {
 with server.route('/author/updates') fn(params) fn(req, end) if req.method {
 	'POST' -> {
 		// assume urlencoded form data format s=(.*)
+		// it seems <form> textarea sends \r\n's, so translate those
 		status := req.body |>
 			slice(2) |>
 			http.percentDecode() |>
@@ -192,6 +194,10 @@ with server.route('/') fn(params) fn(req, end) if req.method {
 				body: view.page(
 					view.search(query) <<
 						view.content(updates, last?, next?, page, count, query)
+					if query {
+						? -> ?
+						_ -> 'Search "{{0}}"' |> format(query)
+					}
 				)
 			})
 		}

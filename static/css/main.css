@@ -43,6 +43,7 @@ textarea {
     padding: .5em .8em;
     color: var(--primary-text);
     font-family: system-ui, sans-serif;
+    tab-size: 4;
 }
 
 input::placeholder,
@@ -54,7 +55,7 @@ header,
 h1,
 main {
     width: calc(100% - 32px);
-    max-width: 760px;
+    max-width: 860px;
     margin: 1em auto;
 }
 
@@ -65,17 +66,31 @@ header {
     justify-content: space-between;
 }
 
-header a {
+header .logo {
+    font-weight: bold;
+}
+
+nav {
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: center;
+    gap: .5em;
+}
+
+header a,
+header button {
+    display: inline;
+    cursor: pointer;
     color: var(--primary-text);
+    background: transparent;
+    border: 0;
+    border-radius: 0;
     text-decoration: none;
 }
 
-header a:hover {
+header a:hover,
+header button:hover {
     text-decoration: underline;
-}
-
-header .logo {
-    font-weight: bold;
 }
 
 h1 {
@@ -90,6 +105,7 @@ main {
 form {
     position: relative;
     margin-bottom: 2em;
+	overflow: hidden;
 }
 
 form input,
@@ -113,6 +129,20 @@ form input:focus,
 form textarea:hover,
 form textarea:focus {
     outline: 0;
+}
+
+form button[type="submit"] {
+	border-radius: 6px;
+	border: 0;
+	color: var(--primary-bg);
+	background: var(--primary-text);
+	margin-top: .5em;
+	float: right;
+	cursor: pointer;
+}
+
+form button[type="submit"]:hover {
+	background: var(--secondary-text);
 }
 
 .pageControls {
@@ -211,11 +241,18 @@ a.pageButton:hover {
 
 .update img {
     max-width: 100%;
+	max-height: 500px;
+	border-radius: 6px;
 }
 
 .update a {
     color: var(--primary-text);
     text-decoration: underline;
+}
+
+.update ul,
+.update ol {
+    padding-left: 3ch;
 }
 
 .update pre,
@@ -226,7 +263,7 @@ a.pageButton:hover {
 }
 
 .update pre {
-    border-radius: 4px;
+    border-radius: 6px;
     box-sizing: border-box;
     padding: 12px 8px;
     overflow-x: auto;
@@ -234,7 +271,7 @@ a.pageButton:hover {
 
 .update code {
     padding: 1px 5px;
-    border-radius: 4px;
+    border-radius: 6px;
 }
 
 .update pre code {
@@ -246,5 +283,27 @@ a.pageButton:hover {
     border-left: 4px solid var(--active-bg);
     padding-left: 1em;
     display: block;
+}
+
+@media only screen and (min-width: 760px) {
+	.update {
+		display: flex;
+		flex-direction: row;
+		align-items: flex-start;
+		justify-content: space-between;
+	}
+	.update-t {
+		flex-grow: 0;
+		flex-shrink: 0;
+		width: 150px;
+		margin-top: 3px;
+	}
+	.update-s {
+		flex-grow: 1;
+		flex-shrink: 1;
+	}
+	.update-s :first-child {
+		margin-top: 0;
+	}
 }
 
