@@ -1,0 +1,93 @@
+// model and data interfaces
+
+{
+	default: default
+	slice: slice
+	map: map
+	filter: filter
+	every: every
+} := import('std')
+{
+	lower: lower
+	split: split
+	contains?: strContains?
+} := import('str')
+fs := import('fs')
+json := import('json')
+datetime := import('datetime')
+
+StreamFile := '/tmp/stream.jsonl'
+
+fn appendUpdate(status, withRes) {
+	updateLine := json.serialize({
+		t: int(time())
+		s: status
+	}) << '\n'
+	fs.appendFile(StreamFile, updateLine, withRes)
+}
+
+fn updatesAtTime(t, withUpdates) with exec('grep', [
+	'-si'
+	string(t)
+	StreamFile
+], '') fn(evt) if evt.type {
+	:error -> withUpdates(?)
+	_ -> evt.stdout |> split('\n') |> map(json.parse) |>
+		filter(fn(u) u != ?) |> filter(fn(u) u.t = t) |> withUpdates()
+}
+
+fn latestUpdates(page, count, searchQuery, withUpdates) {
+	with fs.readFile(StreamFile) fn(file) if file {
+		? -> withUpdates(?)
+		_ -> {
+			updates := file |> split('\n') |> filter(fn(s) s != '') |> map(json.parse)
+			if {
+				count < 0 -> updates
+				_ -> {
+					keywords := searchQuery |>
+						default('') |>
+						split(' ') |>
+						filter(fn(s) s != '') |>
+						map(lower)
+					updates <- updates |> with filter() fn(update) {
+						s := update.s |> lower()
+						keywords |> with every() fn(word) s |> strContains?(word)
+					}
+
+					// pagination and slicing
+					start := len(updates) - page * count
+					end := start + count
+					withUpdates(
+						updates |> slice(start, end)
+						// previous page exists?
+						end < len(updates)
+						// next page exists?
+						start > 0
+					)
+				}
+			}
+		}
+	}
+}
+
+fn updatesOnDay(year, month, day, withUpdates) {
+	minTime := datetime.timestamp({
+		year: year, month: month, day: day
+		hour: 0, minute: 0, second: 0
+	})
+	maxTime := datetime.timestamp({
+		year: year, month: month, day: day
+		hour: 23, minute: 59, second: 59
+	})
+
+	with fs.readFile(StreamFile) fn(file) if file {
+		? -> withUpdates(?)
+		_ -> file |>
+			split('\n') |>
+			filter(fn(s) s != '') |>
+			map(json.parse) |>
+			filter(fn(update) update.t >= minTime & update.t <= maxTime) |>
+			withUpdates()
+	}
+}
+

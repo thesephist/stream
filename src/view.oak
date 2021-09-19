@@ -1,0 +1,130 @@
+// template pages
+
+{
+	default: default
+	map: map
+	reverse: reverse
+} := import('std')
+{
+	padStart: padStart
+	join: join
+} := import('str')
+{
+	format: format
+} := import('fmt')
+datetime := import('datetime')
+md := import('md')
+
+fn date(t) {
+	d := datetime.describe(t)
+	'<a href="/on/{{0}}/{{1}}/{{2}}">{{0}}/{{1}}/{{2}}</a>
+	<a href="/updates/{{6}}">{{3}}:{{4}}:{{5}}</a>' |> format(
+		d.year
+		d.month
+		d.day
+		d.hour
+		d.minute |> string() |> padStart(2, '0')
+		d.second |> string() |> padStart(2, '0')
+		t
+	)
+}
+
+fn feedURL(page, count, query) {
+	params := []
+	if page != 1 {
+		true -> params << 'p=' + string(page)
+	}
+	if count != 50 {
+		true -> params << 'n=' + string(count)
+	}
+	if query != ? {
+		true -> params << 'q=' + string(query)
+	}
+	if params {
+		[] -> '/'
+		_ -> '/?' << params |> join('&')
+	}
+}
+
+fn update(u) '<div class="update">
+	<div class="update-t" data-timestamp="{{0}}">{{1}}</div>
+	<div class="update-s">{{2}}</div>
+</div>' |> format(
+	u.t
+	u.t |> date()
+	md.transform(u.s)
+)
+
+fn feed(updates) if updates {
+	[] -> '<div class="feed">No updates</div>'
+	_ -> '<div class="feed">{{0}}</div>' |>
+		format(updates |> reverse() |> map(update) |> join())
+}
+
+fn index(updates, last?, next?, page, count, query) '
+{{0}}
+<div class="pageControls">{{1}}{{2}}</div>
+' |> format(
+	feed(updates)
+	if last? {
+		true -> '<a class="pageButton" href="{{0}}">&larr;</a>' |> format(
+			feedURL(page - 1, count, query)
+		)
+		_ -> ''
+	}
+	if next? {
+		true -> '<a class="pageButton" href="{{0}}">&rarr;</a>' |> format(
+			feedURL(page + 1, count, query)
+		)
+		_ -> ''
+	}
+)
+
+fn author '<form class="author" action="/updates" method="post">
+	<textarea type="text" name="s"
+		placeholder="What are you thinking?"
+		required autofocus></textarea>
+	<button type="submit">Send</button>
+</form>'
+
+fn search(searchQuery) '<form class="search" action="/" method="get">
+	<input type="text" name="q"
+		placeholder="Search..."
+		value="{{0}}"
+		required autofocus />
+</form>' |> format(
+	searchQuery |> default('')
+)
+
+fn page(body, title, searchQuery) '<!doctype html>
+<head>
+	<meta charset="utf-8">
+	<title>{{0}}</title>
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<link rel="stylesheet" href="/s/css/main.css">
+</head>
+<body>
+	<header>
+		<a href="/" class="logo">the stream</a>
+		<nav>
+			<a href="/about/">about</a>
+		</nav>
+	</header>
+	<main>
+		<h1>{{2}}</h1>
+		{{1}}
+	</main>
+	<footer>
+	</footer>
+</body>' |> format(
+	if title {
+		?, '' -> 'the stream'
+		_ -> title + ' | the stream'
+	}
+	body
+	if title {
+		? -> 'Linus\'s stream'
+		_ -> title
+	}
+)
+

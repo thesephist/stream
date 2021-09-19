@@ -1,0 +1,166 @@
+html,
+body {
+    margin: 0;
+}
+
+body {
+    --primary-bg: #fdfeff;
+    --primary-text: #111111;
+    --secondary-bg: #eeeef3;
+    --secondary-text: #9b9b9b;
+    --hover-bg: #dde1e5;
+    --active-bg: #cdcfd2;
+    --translucent: rgba(249, 250, 251, .8);
+    --transparent: rgba(249, 250, 251, 0);
+}
+
+.dark {
+    --primary-bg: #141516;
+    --primary-text: #ebebeb;
+    --secondary-bg: #30373a;
+    --secondary-text: #a4a7a9;
+    --hover-bg: #474c50;
+    --active-bg: #626569;
+    --translucent: rgba(47, 52, 55, .8);
+    --transparent: rgba(47, 52, 55, 0);
+}
+
+body {
+    font-family: system-ui, sans-serif;
+    color: var(--primary-text);
+    background: var(--primary-bg);
+
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    border-bottom: 8px solid #111111;
+}
+
+input,
+button,
+textarea {
+	font-size: 1em;
+	padding: .4em .8em;
+	color: var(--primary-text);
+    font-family: system-ui, sans-serif;
+}
+
+header,
+main {
+	width: calc(100% - 32px);
+	max-width: 780px;
+	margin: 1em auto;
+}
+
+header {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+}
+
+header a {
+	color: var(--primary-text);
+	text-decoration: none;
+}
+
+header a:hover {
+	text-decoration: underline;
+}
+
+header .logo {
+	font-weight: bold;
+}
+
+form {
+	position: relative;
+	margin-bottom: 2em;
+}
+
+form input,
+form textarea {
+	display: block;
+	border-radius: 6px;
+	border: 0;
+	background: var(--secondary-bg);
+	width: 100%;
+	box-sizing: border-box;
+}
+
+form textarea {
+	min-height: 5em;
+	resize: vertical;
+}
+
+form input:hover,
+form input:focus,
+form textarea:hover,
+form textarea:focus {
+	outline: 0;
+}
+
+.pageControls {
+	float: right;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: flex-end;
+	gap: .75em;
+}
+
+.pageControls a {
+	color: var(--primary-text);
+	text-decoration: none;
+}
+
+.pageControls a:hover {
+	text-decoration: underline;
+}
+
+a.pageButton {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 1.5em;
+	height: 1.5em;
+	width: 1.5em;
+	border-radius: 50%;
+	background: var(--secondary-bg);
+}
+
+a.pageButton:hover {
+	background: var(--hover-bg);
+	text-decoration: none;
+}
+
+.update {
+	margin-bottom: 1.5em;
+	word-wrap: break-word;
+}
+
+.update .update-t {
+	font-size: 14px;
+	color: var(--secondary-text);
+	margin-bottom: -.75em;
+}
+
+.update .update-t a {
+	color: var(--secondary-text);
+	text-decoration: none;
+}
+
+.update .update-t a:hover {
+	text-decoration: underline;
+}
+
+.update .update-s {
+
+}
+
+/* update Markdown */
+
+.update p,
+.update li {
+	line-height: 1.5em;
+}
+
