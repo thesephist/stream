@@ -19,6 +19,28 @@ datetime := import('datetime')
 
 StreamFile := '/tmp/stream.jsonl'
 
+fn intoUpdates(s) {
+	lastIdx := 0
+	lines := []
+	fn sub(i) if s.(i) {
+		? -> if i {
+			lastIdx -> ?
+			_ -> lines << s |> slice(lastIdx, i) |> json.parse()
+		}
+		'\n' -> {
+			if i {
+				lastIdx -> ?
+				_ -> lines << s |> slice(lastIdx, i) |> json.parse()
+			}
+			lastIdx <- i + 1
+			sub(i + 1)
+		}
+		_ -> sub(i + 1)
+	}
+	sub(0)
+	lines
+}
+
 fn appendUpdate(status, withRes) {
 	updateLine := json.serialize({
 		t: int(time())
@@ -33,14 +55,13 @@ fn updatesAtTime(t, withUpdates) with exec('grep', [
 	StreamFile
 ], '') fn(evt) if evt.type {
 	:error -> withUpdates(?)
-	_ -> evt.stdout |> split('\n') |> map(json.parse) |>
-		filter(fn(u) u != ?) |> filter(fn(u) u.t = t) |> withUpdates()
+	_ -> evt.stdout |> intoUpdates() |> filter(fn(u) u.t = t) |> withUpdates()
 }
 
 fn deleteAtTime(t, withRes) with fs.readFile(StreamFile) fn(file) if file {
 	? -> withRes(?)
 	_ -> {
-		updates := file |> split('\n') |> filter(fn(s) s != '') |> map(json.parse)
+		updates := file |> intoUpdates()
 		deletedUpdates := updates |> with filter() fn(u) u.t != t
 
 		updatedLines := deletedUpdates |> map(json.serialize) |> join('\n')
@@ -52,7 +73,7 @@ fn latestUpdates(page, count, searchQuery, withUpdates) {
 	with fs.readFile(StreamFile) fn(file) if file {
 		? -> withUpdates(?)
 		_ -> {
-			updates := file |> split('\n') |> filter(fn(s) s != '') |> map(json.parse)
+			updates := file |> intoUpdates()
 			if {
 				count < 0 -> updates
 				_ -> {
@@ -95,9 +116,7 @@ fn updatesOnDay(year, month, day, withUpdates) {
 	with fs.readFile(StreamFile) fn(file) if file {
 		? -> withUpdates(?)
 		_ -> file |>
-			split('\n') |>
-			filter(fn(s) s != '') |>
-			map(json.parse) |>
+			intoUpdates() |>
 			filter(fn(update) update.t >= minTime & update.t <= maxTime) |>
 			withUpdates()
 	}

@@ -34,7 +34,7 @@ fn feedURL(page, count, query) {
 	if page != 1 {
 		true -> params << 'p=' + string(page)
 	}
-	if count != 50 {
+	if count != 25 {
 		true -> params << 'n=' + string(count)
 	}
 	if query != ? {
