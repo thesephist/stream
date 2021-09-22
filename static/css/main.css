@@ -10,19 +10,33 @@ body {
     --secondary-text: #9b9b9b;
     --hover-bg: #dde1e5;
     --active-bg: #cdcfd2;
-    --translucent: rgba(249, 250, 251, .8);
-    --transparent: rgba(249, 250, 251, 0);
+
+    --dark-primary-bg: #141516;
+    --dark-primary-text: #ebebeb;
+    --dark-secondary-bg: #30373a;
+    --dark-secondary-text: #a4a7a9;
+    --dark-hover-bg: #474c50;
+    --dark-active-bg: #626569;
 }
 
 .dark {
-    --primary-bg: #141516;
-    --primary-text: #ebebeb;
-    --secondary-bg: #30373a;
-    --secondary-text: #a4a7a9;
-    --hover-bg: #474c50;
-    --active-bg: #626569;
-    --translucent: rgba(47, 52, 55, .8);
-    --transparent: rgba(47, 52, 55, 0);
+    --primary-bg: var(--dark-primary-bg);
+    --primary-text: var(--dark-primary-text);
+    --secondary-bg: var(--dark-secondary-bg);
+    --secondary-text: var(--dark-secondary-text);
+    --hover-bg: var(--dark-hover-bg);
+    --active-bg: var(--dark-active-bg);
+}
+
+@media (prefers-color-scheme: dark) {
+    body:not(.light) {
+        --primary-bg: var(--dark-primary-bg);
+        --primary-text: var(--dark-primary-text);
+        --secondary-bg: var(--dark-secondary-bg);
+        --secondary-text: var(--dark-secondary-text);
+        --hover-bg: var(--dark-hover-bg);
+        --active-bg: var(--dark-active-bg);
+    }
 }
 
 body {
@@ -96,6 +110,7 @@ header button:hover {
 h1 {
     margin-top: 0.75em;
     margin-bottom: 0.25em;
+    line-height: 1.4em;
 }
 
 main {
@@ -105,7 +120,7 @@ main {
 form {
     position: relative;
     margin-bottom: 2em;
-	overflow: hidden;
+    overflow: hidden;
 }
 
 form input,
@@ -132,17 +147,17 @@ form textarea:focus {
 }
 
 form button[type="submit"] {
-	border-radius: 6px;
-	border: 0;
-	color: var(--primary-bg);
-	background: var(--primary-text);
-	margin-top: .5em;
-	float: right;
-	cursor: pointer;
+    border-radius: 6px;
+    border: 0;
+    color: var(--primary-bg);
+    background: var(--primary-text);
+    margin-top: .5em;
+    float: right;
+    cursor: pointer;
 }
 
 form button[type="submit"]:hover {
-	background: var(--secondary-text);
+    background: var(--secondary-text);
 }
 
 .pageControls {
@@ -204,12 +219,17 @@ a.pageButton:hover {
     text-decoration: underline;
 }
 
+.update-t .relativestamp {
+    margin-bottom: 6px;
+}
+
 /* update Markdown */
 
 .update h1,
 .update h2,
 .update h3 {
     margin: .75em 0 .5em 0;
+    line-height: 1.4em;
 }
 
 .update h1 {
@@ -241,8 +261,8 @@ a.pageButton:hover {
 
 .update img {
     max-width: 100%;
-	max-height: 500px;
-	border-radius: 6px;
+    max-height: 500px;
+    border-radius: 6px;
 }
 
 .update a {
@@ -286,24 +306,24 @@ a.pageButton:hover {
 }
 
 @media only screen and (min-width: 760px) {
-	.update {
-		display: flex;
-		flex-direction: row;
-		align-items: flex-start;
-		justify-content: space-between;
-	}
-	.update-t {
-		flex-grow: 0;
-		flex-shrink: 0;
-		width: 150px;
-		margin-top: 3px;
-	}
-	.update-s {
-		flex-grow: 1;
-		flex-shrink: 1;
-	}
-	.update-s :first-child {
-		margin-top: 0;
-	}
+    .update {
+        display: flex;
+        flex-direction: row;
+        align-items: flex-start;
+        justify-content: space-between;
+    }
+    .update-t {
+        flex-grow: 0;
+        flex-shrink: 0;
+        width: 134px;
+        margin-top: 3px;
+    }
+    .update-s {
+        flex-grow: 1;
+        flex-shrink: 1;
+    }
+    .update-s :first-child {
+        margin-top: 0;
+    }
 }
 
