@@ -1,0 +1,29 @@
+[Unit]
+Description=stream server
+ConditionPathExists=/home/stream-user/go/bin/oak
+After=network.target
+
+[Service]
+Type=simple
+User=stream-user
+LimitNOFILE=1024
+PermissionsStartOnly=true
+
+Restart=on-failure
+RestartSec=100ms
+StartLimitIntervalSec=60
+
+WorkingDirectory=/home/stream-user/stream
+ExecStart=/home/stream-user/go/bin/oak ./src/main.oak
+
+# make sure log directory exists and owned by syslog
+PermissionsStartOnly=true
+ExecStartPre=/bin/mkdir -p /var/log/stream
+ExecStartPre=/bin/chown syslog:adm /var/log/stream
+ExecStartPre=/bin/chmod 755 /var/log/stream
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=stream
+
+[Install]
+WantedBy=multi-user.target
