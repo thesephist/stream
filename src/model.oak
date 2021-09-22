@@ -1,6 +1,7 @@
 // model and data interfaces
 
 {
+	println: println
 	default: default
 	slice: slice
 	map: map
@@ -17,28 +18,28 @@ fs := import('fs')
 json := import('json')
 datetime := import('datetime')
 
-StreamFile := '/tmp/stream.jsonl'
+StreamFile := './db/stream.jsonl'
+if fs.statFile(StreamFile) {
+	? -> if fs.writeFile(StreamFile, '') {
+		true -> println('Created database at ' + StreamFile)
+		_ -> {
+			println('Could not create database!')
+			exit(1)
+		}
+	}
+}
 
 fn intoUpdates(s) {
-	lastIdx := 0
 	lines := []
-	fn sub(i) if s.(i) {
-		? -> if i {
-			lastIdx -> ?
-			_ -> lines << s |> slice(lastIdx, i) |> json.parse()
-		}
-		'\n' -> {
-			if i {
-				lastIdx -> ?
-				_ -> lines << s |> slice(lastIdx, i) |> json.parse()
-			}
-			lastIdx <- i + 1
-			sub(i + 1)
-		}
-		_ -> sub(i + 1)
+	buf := ''
+	parse := json.parse
+	fn sub(i) if c := s.(i) {
+		? -> lines << parse(buf)
+		'\n' -> sub(i + 1, lines << parse(buf), buf <- '')
+		_ -> sub(i + 1, buf << c)
 	}
 	sub(0)
-	lines
+	lines |> filter(fn(u) u != :error)
 }
 
 fn appendUpdate(status, withRes) {
@@ -82,9 +83,12 @@ fn latestUpdates(page, count, searchQuery, withUpdates) {
 						split(' ') |>
 						filter(fn(s) s != '') |>
 						map(lower)
-					updates <- updates |> with filter() fn(update) {
-						s := update.s |> lower()
-						keywords |> with every() fn(word) s |> strContains?(word)
+					updates <- if keywords {
+						[] -> updates
+						_ -> updates |> with filter() fn(update) {
+							s := update.s |> lower()
+							keywords |> with every() fn(word) s |> strContains?(word)
+						}
 					}
 
 					// pagination and slicing
@@ -108,10 +112,7 @@ fn updatesOnDay(year, month, day, withUpdates) {
 		year: year, month: month, day: day
 		hour: 0, minute: 0, second: 0
 	})
-	maxTime := datetime.timestamp({
-		year: year, month: month, day: day
-		hour: 23, minute: 59, second: 59
-	})
+	maxTime := minTime + 86400 - 1
 
 	with fs.readFile(StreamFile) fn(file) if file {
 		? -> withUpdates(?)
