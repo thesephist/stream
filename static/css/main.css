@@ -124,6 +124,14 @@ main {
     line-height: 1.5em;
 }
 
+.about a {
+    color: inherit;
+}
+
+.about a:hover {
+    background: var(--hover-bg);
+}
+
 form {
     position: relative;
     margin-bottom: 2em;

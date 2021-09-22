@@ -95,7 +95,36 @@ fn author '<form class="author" action="/author/updates" method="post">
 </form>'
 
 fn about '<div class="about">
-	<p>Welcome to my <strong>stream</strong>!</p>
+	<p>Welcome to my <em>stream</em>. Here, you can expect to find a constant
+	stream of updates about what I\'m working on or thinking about, especially
+	around my current interests of creative knowledge tools, software, and
+	writing.</p>
+	<p>You can think of this website like a less noisy, mini Twitter feed I\'ve
+	created just for myself and my updates on my work and thinking. It\'s a
+	micro-blog in the truest sense of the word.</p>
+	<p><em>Why don\'t you just use Twitter, then?</em> I hear you asking. I
+	could, but there are a few problems with Twitter. First, Twitter is
+	extremely noisy.  There\'s a million other people vying for your attention
+	next to what I have to say. Twitter is also quite limiting, not just in the
+	character count, but also in that they only let you write in plain text,
+	without any formatting unless you resort to ugly Unicode hacks. Lastly,
+	Twitter is great for "in the moment" discussion in public, but it\'s not so
+	great as a reference you can link to from the future, and as a historical
+	record of my thinking and work. I wanted a place more purpose-built, more
+	focused, and more permanent for my less permanent thoughts and updates.</p>
+	<p><em>The stream</em> is also the first real application I built with my
+	<a href="https://oaklang.org/">Oak programming language</a>, so building it
+	served as a good testbed and excuse for exercising the language in a real
+	use case and patching in some of the initial bugs and rough edges. At
+	launch, The stream is quite small —&nbsp;only about 500 well-commented
+	lines of Oak code. That seems about right: It\'s complex enough to be a
+	good test for a fledgling language, but simple enough not to overwhelm
+	it.</p>
+	<p>The stream is free and open source <a
+	href="https://github.com/thesephist/stream">on GitHub</a>, if you want to
+	check out how it works. But there isn\'t much to it —&nbsp;all the data
+	lives in a single <a href="https://jsonlines.org/">JSONL</a> file, and
+	there\'s a light view and model layer on top.</p>
 </div>'
 
 fn search(searchQuery) '<form class="search" action="/" method="get">
