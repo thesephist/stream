@@ -88,7 +88,7 @@ nav {
     display: flex;
     flex-direction: row-reverse;
     align-items: center;
-    gap: .5em;
+    gap: 1em;
 }
 
 header a,
@@ -100,6 +100,7 @@ header button {
     border: 0;
     border-radius: 0;
     text-decoration: none;
+    padding: .5em 0;
 }
 
 header a:hover,
@@ -117,6 +118,12 @@ main {
     margin-bottom: 3em;
 }
 
+.about p,
+.about li {
+    max-width: 64ch;
+    line-height: 1.5em;
+}
+
 form {
     position: relative;
     margin-bottom: 2em;
@@ -128,7 +135,7 @@ form textarea {
     display: block;
     border-radius: 6px;
     border: 0;
-    background: var(--secondary-bg);
+    background: var(--hover-bg);
     width: 100%;
     box-sizing: border-box;
 }
@@ -197,17 +204,18 @@ a.pageButton:hover {
 .message {
     font-style: italic;
     color: var(--secondary-text);
+    margin-bottom: 2em;
 }
 
 .update {
-    margin-bottom: 1.5em;
+    margin-bottom: 2.5em;
     word-break: break-word;
 }
 
 .update .update-t {
     font-size: 14px;
     color: var(--secondary-text);
-    margin-bottom: -.75em;
+    margin-bottom: -.5em;
 }
 
 .update .update-t a {
@@ -253,6 +261,7 @@ a.pageButton:hover {
 .update p,
 .update li {
     line-height: 1.5em;
+    max-width: 64ch;
 }
 
 .update strike {
@@ -311,6 +320,7 @@ a.pageButton:hover {
         flex-direction: row;
         align-items: flex-start;
         justify-content: space-between;
+        margin-bottom: 1.5em;
     }
     .update-t {
         flex-grow: 0;

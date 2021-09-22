@@ -17,8 +17,8 @@ md := import('md')
 
 fn date(t) {
 	d := datetime.describe(t)
-	'<a class="datestamp" href="/on/{{0}}/{{1}}/{{2}}">{{0}}/{{1}}/{{2}}</a>
-	<a class="clockstamp" href="/updates/{{5}}">{{3}}:{{4}}</a>' |> format(
+	'<a class="datestamp" href="/on/{{0}}/{{1}}/{{2}}" title="Updates on this date">{{0}}/{{1}}/{{2}}</a>
+	<a class="clockstamp" href="/updates/{{5}}" title="Permalink to this update">{{3}}:{{4}}</a>' |> format(
 		d.year
 		d.month
 		d.day
@@ -70,13 +70,13 @@ fn content(updates, last?, next?, page, count, query) '
 ' |> format(
 	feed(updates)
 	if last? {
-		true -> '<a class="pageButton" href="{{0}}">&larr;</a>' |> format(
+		true -> '<a class="pageButton" href="{{0}}" title="Previous page">&larr;</a>' |> format(
 			feedURL(page - 1, count, query)
 		)
 		_ -> ''
 	}
 	if next? {
-		true -> '<a class="pageButton" href="{{0}}">&rarr;</a>' |> format(
+		true -> '<a class="pageButton" href="{{0}}" title="Next page">&rarr;</a>' |> format(
 			feedURL(page + 1, count, query)
 		)
 		_ -> ''
@@ -94,14 +94,13 @@ fn author '<form class="author" action="/author/updates" method="post">
 	<button type="submit">Delete</button>
 </form>'
 
-fn about '
-<p>Welcome to the <strong>stream</strong>!</p>
-<p>Why?</p>
-'
+fn about '<div class="about">
+	<p>Welcome to my <strong>stream</strong>!</p>
+</div>'
 
 fn search(searchQuery) '<form class="search" action="/" method="get">
 	<input type="text" name="q"
-		placeholder="Search..."
+		placeholder="Search the stream..."
 		value="{{0}}"
 		required autofocus />
 </form>' |> format(
@@ -147,7 +146,7 @@ fn page(body, title, searchQuery) '<!doctype html>
 	}
 	updateScheme();
 	</script>
-	<script src="/s/js/main.js" async defer></script>
+	<script src="/s/js/main.js"></script>
 </body>' |> format(
 	if title {
 		?, '' -> 'the stream'

@@ -40,7 +40,7 @@ with server.route('/updates/:timestamp') fn(params) fn(req, end) if req.method {
 			)
 		})
 		_ -> with model.updatesAtTime(timestamp) fn(updates) if updates {
-			? -> end({
+			?, [] -> end({
 				status: 500
 				headers: PageHeaders
 				body: view.page(
