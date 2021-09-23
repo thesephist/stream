@@ -1,4 +1,4 @@
-// stream is a ... TODO: finish this
+// The stream micro-blog server
 
 {
 	default: default
