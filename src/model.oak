@@ -18,7 +18,9 @@ fs := import('fs')
 json := import('json')
 datetime := import('datetime')
 
-StreamFile := './db/stream.jsonl'
+config := import('config')
+StreamFile := config.StreamFile
+
 if fs.statFile(StreamFile) {
 	? -> if fs.writeFile(StreamFile, '') {
 		true -> println('Created database at ' + StreamFile)

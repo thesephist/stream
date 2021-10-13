@@ -20,10 +20,10 @@ path := import('path')
 json := import('json')
 http := import('http')
 
+config := import('config')
 model := import('model')
 view := import('view')
 
-Port := 10020
 PageHeaders := {
 	'Content-Type': 'text/html'
 }
@@ -177,7 +177,7 @@ with server.route('/about/') fn(params) fn(req, end) if req.method {
 with server.route('/') fn(params) fn(req, end) if req.method {
 	'GET' -> {
 		page := int(params.p) |> default(1)
-		count := int(params.n) |> default(25)
+		count := int(params.n) |> default(config.PageSize)
 		query := params.q
 
 		with model.latestUpdates(page, count, query) fn(updates, last?, next?) if updates {
@@ -205,6 +205,6 @@ with server.route('/') fn(params) fn(req, end) if req.method {
 	_ -> end(http.MethodNotAllowed)
 }
 
-server.start(Port)
-printf('Stream server running at {{0}}', Port)
+server.start(config.Port)
+printf('Stream server running at {{0}}', config.Port)
 

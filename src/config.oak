@@ -1,0 +1,8 @@
+// app-wide configuration
+
+Port := 10020
+// Number of updates per page by default
+PageSize := 10
+// Where updates are persisted to disk
+StreamFile := './db/stream.jsonl'
+
