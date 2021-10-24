@@ -297,6 +297,14 @@ a.pageButton:hover {
     background: var(--hover-bg);
     font-size: 1em;
     font-family: 'IBM Plex Mono', 'Menlo', 'Monaco', monospace;
+    /*
+     * In Safari (2021), word-break: break-word from `.update` combined with
+     * certain contents of <pre> tags that do not begin lines with whitespace
+     * break line-wrapping behavior. This inversion of word-break works around
+     * that Safari bug (or at least, what appears to be a browser bug, as
+     * Chrome does not reproduce).
+     */
+    word-break: initial;
 }
 
 .update pre {
@@ -337,6 +345,7 @@ a.pageButton:hover {
         margin-top: 3px;
     }
     .update-s {
+        width: 0;
         flex-grow: 1;
         flex-shrink: 1;
     }
