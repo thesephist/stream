@@ -67,7 +67,9 @@ fn deleteAtTime(t, withRes) with fs.readFile(StreamFile) fn(file) if file {
 		updates := file |> intoUpdates()
 		deletedUpdates := updates |> with filter() fn(u) u.t != t
 
-		updatedLines := deletedUpdates |> map(json.serialize) |> join('\n')
+		updatedLines := deletedUpdates |>
+			map(json.serialize) |>
+			join('\n') + '\n' // appended log lines always trail with a '\n'
 		fs.writeFile(StreamFile, updatedLines, withRes)
 	}
 }
