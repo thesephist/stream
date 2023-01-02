@@ -24,7 +24,7 @@ Because the app is so simple (and I'm still trying to figure out what an "idioma
 
 ## Build and deploy
 
-Oak comes packaged as a single statically-linked executable, avaialble from [the website](https://oaklang.org). I deploy the stream as a systemd process that runs `./src/main.oak`. The server will automatically create a `./db/stream.jsonl` data file if it's not already there when it starts.
+Oak comes packaged as a single statically-linked executable, available from [the website](https://oaklang.org). I deploy the stream as a systemd process that runs `./src/main.oak`. The server will automatically create a `./db/stream.jsonl` data file if it's not already there when it starts.
 
 I use GNU Make to manage some common development tasks.
 
