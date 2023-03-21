@@ -58,7 +58,7 @@ with server.route('/updates/:timestamp') fn(params) fn(req, end) if req.method {
 				})
 				_ -> end({
 					status: 200
-					headers: { 'Content-Type': 'text/plain' }
+					headers: { 'Content-Type': http.MimeTypes.txt }
 					body: updates |> map(fn(u) u.s) |> join('\n\n')
 				})
 			}
@@ -179,6 +179,7 @@ with server.route('/') fn(params) fn(req, end) if req.method {
 		page := int(params.p) |> default(1)
 		count := int(params.n) |> default(config.PageSize)
 		query := params.q
+		raw? := params.raw != ?
 
 		with model.latestUpdates(page, count, query) fn(updates, last?, next?) if updates {
 			? -> end({
@@ -188,18 +189,25 @@ with server.route('/') fn(params) fn(req, end) if req.method {
 					view.search() << view.message('Could not read latest updates.')
 				)
 			})
-			_ -> end({
-				status: 200
-				headers: PageHeaders
-				body: view.page(
-					view.search(query) <<
-						view.content(updates, last?, next?, page, count, query)
-					if query {
-						? -> ?
-						_ -> 'Search "{{0}}"' |> format(query)
-					}
-				)
-			})
+			_ -> if raw? {
+				true -> end({
+					status: 200
+					headers: { 'Content-Type': http.MimeTypes.json }
+					body: json.serialize(updates)
+				})
+				_ -> end({
+					status: 200
+					headers: PageHeaders
+					body: view.page(
+						view.search(query) <<
+							view.content(updates, last?, next?, page, count, query)
+						if query {
+							? -> ?
+							_ -> 'Search "{{0}}"' |> format(query)
+						}
+					)
+				})
+			}
 		}
 	}
 	_ -> end(http.MethodNotAllowed)
